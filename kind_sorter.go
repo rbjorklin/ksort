@@ -1,10 +1,13 @@
 // Forked from helm.sh/helm/v3/pkg/releaseutil/kind_sorter.go
 /*
 Copyright The Helm Authors.
+
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
+
     http://www.apache.org/licenses/LICENSE-2.0
+
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,6 +30,7 @@ type KindSortOrder []string
 //
 // Those occurring earlier in the list get installed before those occurring later in the list.
 var InstallOrder KindSortOrder = []string{
+	"PriorityClass",
 	"Namespace",
 	"NetworkPolicy",
 	"ResourceQuota",
@@ -59,6 +63,7 @@ var InstallOrder KindSortOrder = []string{
 	"StatefulSet",
 	"Job",
 	"CronJob",
+	"IngressClass",
 	"Ingress",
 	"APIService",
 }
@@ -69,6 +74,7 @@ var InstallOrder KindSortOrder = []string{
 var UninstallOrder KindSortOrder = []string{
 	"APIService",
 	"Ingress",
+	"IngressClass",
 	"Service",
 	"CronJob",
 	"Job",
@@ -101,6 +107,7 @@ var UninstallOrder KindSortOrder = []string{
 	"ResourceQuota",
 	"NetworkPolicy",
 	"Namespace",
+	"PriorityClass",
 }
 
 // sort manifests by kind.
