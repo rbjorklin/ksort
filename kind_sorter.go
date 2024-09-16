@@ -113,15 +113,15 @@ var UninstallOrder KindSortOrder = []string{
 // sort manifests by kind.
 //
 // Results are sorted by 'ordering', keeping order of items with equal kind/priority
-func sortManifestsByKind(manifests []releaseutil.Manifest, ordering KindSortOrder) []releaseutil.Manifest {
+func sortManifestsByKind(manifests []releaseutil.Manifest, ordering KindSortOrder, alphabetical bool) []releaseutil.Manifest {
 	sort.SliceStable(manifests, func(i, j int) bool {
-		return lessByKind(manifests[i], manifests[j], manifests[i].Head.Kind, manifests[j].Head.Kind, ordering)
+		return lessByKind(manifests[i], manifests[j], manifests[i].Head.Kind, manifests[j].Head.Kind, ordering, alphabetical)
 	})
 
 	return manifests
 }
 
-func lessByKind(a interface{}, b interface{}, kindA string, kindB string, o KindSortOrder) bool {
+func lessByKind(a interface{}, b interface{}, kindA string, kindB string, o KindSortOrder, alphabetical bool) bool {
 	ordering := make(map[string]int, len(o))
 	for v, k := range o {
 		ordering[k] = v
@@ -130,10 +130,17 @@ func lessByKind(a interface{}, b interface{}, kindA string, kindB string, o Kind
 	first, aok := ordering[kindA]
 	second, bok := ordering[kindB]
 
+	manifestA, _ := a.(releaseutil.Manifest)
+	manifestB, _ := b.(releaseutil.Manifest)
+
 	if !aok && !bok {
 		// if both are unknown then sort alphabetically by kind, keep original order if same kind
 		if kindA != kindB {
 			return kindA < kindB
+		}
+		if alphabetical && kindA == kindB {
+			// sort alphabetically only if kind is equal
+			return manifestA.Name < manifestB.Name
 		}
 		return first < second
 	}
@@ -143,6 +150,10 @@ func lessByKind(a interface{}, b interface{}, kindA string, kindB string, o Kind
 	}
 	if !bok {
 		return true
+	}
+	if alphabetical && kindA == kindB {
+		// sort alphabetically only if kind is equal
+		return manifestA.Name < manifestB.Name
 	}
 	// sort different kinds, keep original order if same priority
 	return first < second
